@@ -176,6 +176,7 @@ class Screen(object):
                 raise ValueError('Invalid rotation value',
                                  rot, self.set.rotation)
             cmd.extend(['--rotate', rot])
+            self.rotation = self.set.rotation
             has_changed = True
 
         if self.set.position:
@@ -255,15 +256,17 @@ def exec_cmd(cmd):
 
 def create_screen(name_str, modes):
     rot = None
-    sc_name = name_str.split(' ')[0]
+    fr = name_str.split(' ')
+    sc_name = fr[0]
+    is_primary = 'primary' in name_str
 
     # if connected
     if modes:
-        fr = name_str.split(' ')
         if len(fr) > 2:
-            rot = str_to_rot(name_str.split(' ')[3])
+            # Orientation is 3rd word (4th when 'primary' is displayed)
+            rot = str_to_rot(fr[4 if is_primary else 3])
 
-    return Screen(sc_name, 'primary' in name_str, rot, modes)
+    return Screen(sc_name, is_primary, rot, modes)
 
 
 def parse_xrandr(lines):
